@@ -1,5 +1,5 @@
 /********************************************************************************
-Description.. :	Creates EDD files on the SampleManagement Share for upload into PEMS.  
+Description.. :	Creates EDD files on the SampleManagement Share for upload into 
 				Intended to replace EDD generator (MS Access system).
 
 Parameters... :	- SDG (Sample Delivery Group).
@@ -240,7 +240,7 @@ fileId := FileType;
 
 /*tempFilePath := GlbDefaultWorkPath + "Temp\";
 
-tempFilePath := "\\ddapp04\SampleManagement\EDD\";   
+tempFilePath := "\\Server\share\";   
 /*you have to add the svc acct starlims is using to the folder you want to write to. kdk;
 
 
