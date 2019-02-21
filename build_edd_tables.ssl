@@ -1,0 +1,60 @@
+/********************************************************************************
+Description.. :	
+
+Parameters... :	- 
+
+Returns...... :	- 
+
+Author....... :	T6F
+Date......... : 2018-09-24
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. : 
+Author....... :	
+Date......... :	
+_______________________________________________________________________________
+********************************************************************************/;
+:PARAMETERS sdg, runs, sParam, sParamVal;
+
+/*:DEFAULT sdg, '';
+/*:DEFAULT runs, {};
+/*:DEFAULT sParam, 'AnalyteName';
+/*:DEFAULT sParamVal, '';
+
+:DECLARE sWhere;
+
+/*:IF analyte == "POTATO SOUP" ;
+/*	where := "Sample_SDG=?sdg?";
+/*:ELSE;
+/*	where := "AnalyteName=?analyte?";
+/*:ENDIF;
+
+sWhere := limsstring(sParam + "= ?sParamVal?");
+
+
+
+:DECLARE rtnVal, qcTable, smpTable,sTable, qTable, sqlBegin, clearTable, ClearTable2;
+
+clearTable := SQLExecute("DROP TABLE IF EXISTS #sTable");
+ClearTable2 := SQLExecute("DROP TABLE IF EXISTS #qTable");
+
+smpTable := sqlExecute("SELECT * into #sTable from vwAmsed_EDD edd where (edd.Sample_SDG=?sdg? and edd.QCType='') or (edd.LIMSRun in (?runs?) and edd.QCType in ('Blank','LCS','LCSD'))
+
+SELECT * into #qTable from vwAmsed_EDDQC where LIMSRun in (?runs?) 
+
+Insert into #sTable Select distinct QC.* from #qTable QC inner join #sTable s on s.LIMSrun =QC.LIMSRun and s.LabSampleID=QC.LIMSRefCont where QC.QCType in ('MS','MSD','DUP')
+
+Select * from #sTable where "+ sWhere + " order by AnalysisDate ");
+
+
+/*
+/*rtnVal := getdatasetfromarray(smpTable, {"AmountAdded","AnalysisDate","AnalyteID","AnalyteName","ClientSampleID","CountError","CustomerName","Dilution","DupResults","EDD_Date","FiltUnfilt","InstrID","Qualifiers","RecDate","SampID","ResComment","LabName",
+/*											"Matrix","MDA","MDL","Batch","Method","OrigClientSampID","PercentRec","PrepDate","PrepMethod","ProjectID","ProjectName","QCType","QualClass","PercDif","RepNo","ReptBasFlg","ResPrefix","Result","Units","RetTime",
+/*											"Sample_SDG","SowID","SurFlg","TPU","TPUL","TracerFlg","FileID","LOQ","LIMSRun","LIMSTestCode","LIMSMethod","LIIMSReplicate","LIMSRefCont","LIMSResRec","LIMSTestRec"});
+/*											
+/*											
+/*:RETURN rtnVal;
+
+
+:RETURN smpTable;
