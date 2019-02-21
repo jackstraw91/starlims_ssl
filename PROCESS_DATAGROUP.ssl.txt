@@ -1,0 +1,259 @@
+/********************************************************************************
+Description.. :	Creates EDD files on the SampleManagement Share for upload into PEMS.  
+				Intended to replace EDD generator (MS Access system).
+
+Parameters... :	- SDG (Sample Delivery Group).
+
+Returns...... :	- True.
+
+Author....... :	T6F
+Date......... : 2017-11-2
+********************************************************************************
+_______________________________________________________________________________
+
+Modification. : 1
+Author....... :	KDK	-replaced "'" with '"' in the arValX string build so values would have "value" instead of 'value'.  chr(22) doesnt work correctly.
+Date......... :	11/9/2017
+
+Modification : 2
+Author...... : KDK - changed R4 (DUP) tracer query to pull same as non tracer but insert 0.000E+00 for PercentDifference.
+Date........ : 07/18/2018
+_______________________________________________________________________________
+********************************************************************************/;
+:PARAMETERS SDG;
+
+/*:DEFAULT SDG, '0013007';
+
+:DECLARE strSQL, arData, filepath, tracerFlag, runList, pID, rncnt, pName, pInfo, pSOW;
+arData:={};
+pID:={};
+
+
+pName:=buildstring(extractCol(sqlexecute("select ProjectName from vwAmsed_SDGRuns where SDGNUMBER=?SDG?"),1));
+
+runList:= execfunction("EDDGenerator.getRunList",{SDG});
+
+/* put this part in so it immediately will stop if the SDG hasnt been released, thus no runs in the view yet.  Not a neccessity if it becomes problematic kdk 2/1/18;
+:IF empty(runList);
+	:RETURN 0;
+:ENDIF;
+
+pInfo := execfunction("EDDGenerator.getProject",{SDG});
+
+pID :=buildstring(extractCol(pInfo,1));
+pSOW :=buildstring(extractCol(pInfo,2));
+
+:DECLARE i, tmpfilepath, fileId, recordcount, index, counter, k, rnList, rns, dataRows;
+
+
+counter:=0;
+/*recordcount := sqlExecute("select * from vwAmsed_EDD where Sample_SDG=?SDG? and LIMSRun in (?pID?)");
+
+recordcount := ExecFunction("EDDGenerator.buildEDDtables",{sdg, runList});
+
+/* comment above and uncomment if needed for just one test, analyte;
+/*analyte:="Total Uranium";
+/*
+/*recordcount := ExecFunction("EDDGenerator.build_addonTables",{sdg, runList, analyte});
+
+
+i:=1;
+
+:WHILE i<=len(recordcount);
+
+:DECLARE AmtAdded,AnalysisDate,AnalyteID,AnalyteName,ClientSampleID,CountErr,CustName,Dil,DupRes,EddDate,FiltUnfil,InstID,Qual,RecDate,SampId,Comment,LabName,Matrix,MDA,MDL,Batch,Method,OrigID;
+:DECLARE Recovery,PrepDate,PrepMethod,Project,PrjName,QCType,QualClass,PrcntDif,RepNo,ReptFlg,ResPrefix,Result,Units,RetTime,SampDelGrp,SOW,SurFlg,TPU,TPUL,TracerFlg,FileType,LOQ;
+
+
+AmtAdded := recordcount[i, 1];
+AnalysisDate := recordcount[i, 2];
+AnalyteID := recordcount[i, 3];
+AnalyteName :=recordcount[i, 4];
+ClientSampleID :=recordcount[i, 5];
+CountErr :=recordcount[i, 6];
+CustName :=recordcount[i, 7];
+Dil :=recordcount[i, 8];
+DupRes :=recordcount[i, 9];
+EddDate :=recordcount[i, 10];
+FiltUnfil:=recordcount[i, 11];
+InstID :=recordcount[i, 12];
+Qual :=recordcount[i, 13];
+RecDate :=recordcount[i, 14];
+SampId :=recordcount[i, 15];
+Comment :=recordcount[i, 16];
+LabName :=recordcount[i, 17];
+Matrix :=recordcount[i, 18];
+MDA :=recordcount[i, 19];
+MDL :=recordcount[i, 20];
+Batch :=recordcount[i, 21];
+Method :=recordcount[i, 22];
+OrigID :=recordcount[i, 23];
+Recovery :=recordcount[i, 24];
+PrepDate :=recordcount[i, 25];
+PrepMethod:=recordcount[i, 26];
+Project :=pID;
+PrjName :=pName;
+QCType:=recordcount[i, 29];
+QualClass:=recordcount[i, 30];
+PrcntDif:=recordcount[i, 31];
+RepNo :=recordcount[i, 32];
+ReptFlg :=recordcount[i, 33];
+ResPrefix:=recordcount[i, 34];
+Result:=recordcount[i, 35];
+Units:=recordcount[i, 36];
+RetTime:=recordcount[i, 37];
+SampDelGrp:=SDG;
+SOW:=pSOW;
+SurFlg:=recordcount[i, 40];
+TPU:=recordcount[i, 41];
+TPUL:=recordcount[i, 42];
+TracerFlg:=recordcount[i, 43];
+FileType:=recordcount[i, 44];
+LOQ:=recordcount[i, 45];
+
+fileId := FileType;
+
+:IF Matrix =='Wipe';
+	Matrix :='SW';
+:ENDIF;
+
+:IF Matrix =='Solid';
+	Matrix :='SZ';
+:ENDIF;
+
+
+
+:DECLARE k, recordlist, arValX;
+
+		
+		:IF FileId=='R1';
+		
+			:IF TracerFlg =="Y";
+			
+				arValX:= '"' + SOW  + '"' +"," + '"' + Project + '"' +","+ '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+","+ '"' + RecDate + '"' +"," + '"'+ AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ ClientSampleID + '"' +"," + '"'+ RepNo + '"' +"," + '"'+ AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"'+ Matrix + '"' +"," + '"'+ Recovery + '"' +"," + '"'+ "%" + '"' +"," + '"'+ InstID + '"' +"," + '"'+ CountErr + '"' +"," + '"'+ Qual + '"' +"," + '"'+ TPU + '"' +"," + '"'+ TPUL + '"' +"," + '"'+ PrepDate + '"' +"," + '"'+ MDA + '"' +"," + '"'+ ReptFlg + '"' +"," + '"'+ TracerFlg + '"' +"," + '"'+ Comment +'"';
+			
+			:ELSE;
+			
+				arValX:= '"' + SOW  + '"' +"," + '"' + Project + '"' +","+ '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+","+ '"' + RecDate + '"' +"," + '"'+ AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ ClientSampleID + '"' +"," + '"'+ RepNo + '"' +"," + '"'+ AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"'+ Matrix + '"' +"," + '"'+ Result + '"' +"," + '"'+ Units + '"' +"," + '"'+ InstID + '"' +"," + '"'+ CountErr + '"' +"," + '"'+ Qual + '"' +"," + '"'+ TPU + '"' +"," + '"'+ TPUL + '"' +"," + '"'+ PrepDate + '"' +"," + '"'+ MDA + '"' +"," + '"'+ ReptFlg + '"' +"," + '"'+ TracerFlg + '"' +"," + '"'+ Comment +'"';
+			
+			:ENDIF;
+		:ENDIF;
+		:IF FileId=='R2';
+		
+			arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ OrigID + '"' + "," + '"'+ AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"'+ Matrix + '"' +"," + '"' + QCType +'"' + "," + '"'+ Result + '"' +"," + '"'+ Units + '"' + "," + '"' + AmtAdded + '"' + "," + '"' + Recovery + '"' + "," + '"' + PrcntDif + '"' + "," + '"'+ InstID + '"' +"," + '"'+ CountErr + '"' +"," + '"'+ Qual + '"' +"," + '"'+ TPU + '"' +"," + '"'+ TPUL + '"' +"," + '"' + MDA + '"' +"," + '"' + TracerFlg + '"' +"," + '"' + Comment + '"';
+		:ENDIF;
+		:IF FileId=='R3';
+		
+			:IF TracerFlg =="Y";
+			
+				arValX:= '"' + Project + '"' +","+ '"' + PrjName + '"' + "," +'"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"' + "," + '"'+ AnalysisDate + '"' + "," + '"'+ Method + '"' +"," + '"' + Batch + '"' + "," + '"' + SampDelGrp + '"' + "," + '"'+ SampId + '"' +"," + '"'+ AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," + '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Recovery + '"' + "," + '"' + "%" + '"' + "," + '"' + CountErr + '"' + "," + '"' + Qual + '"' + "," + '"' + InstID + '"' + "," + '"' + TPU + '"' +"," + '"'+ TPUL + '"' +"," + '"' + MDA + '"' + "," + '"' + TracerFlg + '"' +"," + '"'+ Comment +'"';
+			
+			:ELSE;
+			
+				arValX:= '"' + Project + '"' +","+ '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"' + "," + '"'+ AnalysisDate + '"' + "," + '"'+ Method + '"' +"," + '"' + Batch + '"' + "," + '"' + SampDelGrp + '"' + "," + '"'+ SampId + '"' +"," + '"'+ AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," + '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Result + '"' + "," + '"' + Units + '"' + "," + '"' + CountErr + '"' + "," + '"' + Qual + '"' + "," + '"' + InstID + '"' + "," + '"' + TPU + '"' +"," + '"'+ TPUL + '"' +"," + '"' + MDA + '"' + "," + '"' + TracerFlg + '"' +"," + '"'+ Comment +'"';
+			
+			:ENDIF;
+			
+		:ENDIF;	
+		:IF fileId=='R4';
+			:IF TracerFlg =="Y";
+				
+				PrcntDif := '0.000E+00';
+				arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ OrigID + '"' + "," + '"' + RepNo + '"' + "," + '"' + AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," +  '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Result + '"' +"," + '"' + Units + '"' + "," + '"' + CountErr + '"' + "," + '"' + Qual + '"' + "," + '"' + PrcntDif + '"' + "," + '"'+ InstID + '"' +"," + '"' + TPU + '"' + "," + '"' + TPUL + '"' + "," + '"' + MDA + '"' + "," + '"' + TracerFlg + '"' + "," + '"' + Comment + '"';
+/*				arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ OrigID + '"' + "," + '"' + RepNo + '"' + "," + '"' + AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," +  '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Recovery + '"' +"," + '"' + "%" + '"' + "," + '"' + CountErr + '"' + "," + '"' + Qual + '"' + "," + '"' + PrcntDif + '"' + "," + '"'+ InstID + '"' +"," + '"' + TPU + '"' + "," + '"' + TPUL + '"' + "," + '"' + MDA + '"' + "," + '"' + TracerFlg + '"' + "," + '"' + Comment + '"';
+		
+			:ELSE;
+				arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ OrigID + '"' + "," + '"' + RepNo + '"' + "," + '"' + AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," +  '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Result + '"' +"," + '"' + Units + '"' + "," + '"' + CountErr + '"' + "," + '"' + Qual + '"' + "," + '"' + PrcntDif + '"' + "," + '"'+ InstID + '"' +"," + '"' + TPU + '"' + "," + '"' + TPUL + '"' + "," + '"' + MDA + '"' + "," + '"' + TracerFlg + '"' + "," + '"' + Comment + '"';
+			:ENDIF;	
+		:ENDIF;	
+		:IF fileId=='N1';
+		
+			arValX:=  '"' + SOW + '"' + "," + '"'  + Project + '"' + "," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+ "," + '"' + RecDate + '"' + "," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"' + ClientSampleID + '"' + "," + '"' + RepNo + '"' + "," + '"' + AnalyteID + '"' + "," + '"' + AnalyteName + '"' + "," + '"' + Matrix + '"' + "," + '"' + QCType + '"' + "," + '"' + Result + '"' +"," + '"' + Units + '"' + "," + '"'+ Qual + '"' +"," + '"'+ QualClass + '"' + "," + '"' + PrepMethod + '"' + "," + '"' + PrepDate + '"' + "," + '"' + MDL + '"' + "," + '"' + FiltUnfil + '"' + "," + '"' + ReptFlg + '"' + "," + '"' + SurFlg + '"' + "," + '"' + Dil + '"' + "," + '"' + LOQ + '"' + "," + '"' + Comment + '"';
+		:ENDIF;
+		:IF fileId=='N2';
+		
+			arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ OrigID + '"' + "," + '"'+ AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"'+ Matrix + '"' +"," + '"' + QCType +'"' + "," + '"'+ Result + '"' +"," + '"'+ Units + '"' + "," + '"' + AmtAdded + '"' + "," + '"' + Recovery + '"' + "," + '"' + PrcntDif + '"' + "," + '"'+ Qual + '"' +"," + '"'+ QualClass + '"' +"," + '"'+ MDL + '"' +"," + '"'+ FiltUnfil + '"' +"," + '"'+ SurFlg + '"' +"," + '"' + Dil + '"' + "," + '"' + Comment + '"';
+		:ENDIF;
+		:IF fileId=='N3';
+		
+			arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"' + SampId + '"' + "," + '"'+ AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"'+ Matrix + '"' +"," + '"' + QCType +'"' + "," + '"'+ Result + '"' +"," + '"'+ Units + '"' + "," + '"' + AmtAdded + '"' + "," + '"' + Recovery + '"' + "," + '"' + Qual + '"' + "," + '"' + QualClass + '"' + "," + '"' + MDL + '"' + "," + '"' + FiltUnfil + '"' + ", " + '"' + SurFlg + '"' + "," + '"' + Dil + '"' + "," + '"' + PrcntDif + '"' + "," + '"' + Comment + '"';
+		
+		:ENDIF;	
+		:IF fileId=='N4';
+		
+			arValX:=  '"' + Project + '"' +"," + '"' + PrjName + '"' + "," + '"' + CustName + '"' +","+ '"' + LabName + '"' +"," + '"'+ EddDate + '"'+"," + '"' + AnalysisDate + '"' +"," + '"'+ Method + '"' +"," + '"'+ Batch + '"' +"," + '"'+ SampDelGrp + '"' +"," + '"'+ SampId + '"' +"," + '"'+ ClientSampleID + '"' + "," + '"' + RepNo + '"' + "," + '"' + AnalyteID + '"' +"," + '"'+ AnalyteName + '"' +"," + '"' + RetTime + '"' + "," + '"' + Matrix + '"' +"," + '"' + QCType +'"' + "," + '"'+ Result + '"' +"," + '"'+ Units + '"' + "," + '"' + Qual + '"' + "," + '"' + QualClass + '"' + "," + '"' + FiltUnfil + '"' + "," + '"' + ReptFlg + '"' + "," + '"' + Dil + '"' + "," + '"' + Comment + '"';
+			
+
+	
+		:ENDIF;
+	
+				
+/*		arValX := StrTran(arValX,'""','');	
+/*		this line removes empty "" from the string and thus the file created;
+				
+
+	DoProc("MakeFile",{sdg, fileId, arValX});
+	counter := counter +1;
+	i := i+ 1;
+	:LOOP;
+
+:ENDWHILE;			
+			
+
+
+:PROCEDURE MakeFile;
+:PARAMETERS SDG, fileId, arValX, sColSep, sLineSep;
+
+
+:DECLARE tempFilePath, arrReturnN1, CSVpath, filetype, fileclass;
+
+
+
+:BEGINCASE;
+	:CASE fileId =='R1';
+		fileclass := 'R';
+		filetype := 'res';
+	:CASE fileId =='R2';
+		fileclass :='R';
+		filetype := 'lcs';
+	:CASE fileId =='R3';
+		fileclass := 'R';
+		filetype := 'mb';
+	:CASE fileId == 'R4';
+		fileclass := 'R';
+		filetype := 'dup';
+	:CASE fileId =='N1';
+		fileclass := 'N';
+		filetype := 'res';
+	:CASE fileId =='N2';
+		fileclass := 'N';
+		filetype := 'ms';
+	:CASE fileId =='N3';
+		fileclass :='N';
+		filetype := 'lcs';
+	:CASE fileId =='N4';
+		fileclass := 'N';
+		filetype == 'tic';
+		
+:ENDCASE;
+		
+
+/*tempFilePath := GlbDefaultWorkPath + "Temp\";
+
+tempFilePath := "\\ddapp04\SampleManagement\EDD\";   
+/*you have to add the svc acct starlims is using to the folder you want to write to. kdk;
+
+
+
+CSVpath := tempFilePath + fileclass + SDG + "." + filetype;
+
+WriteText(CSVpath, arValX + CRLF, "N", "Y");
+
+
+
+:ENDPROC;
+
+dataRows := LimsString(counter);
+usrmes("Processing SDG: " + SDG + " found " + dataRows + " rows."); 
+
+:RETURN counter;
