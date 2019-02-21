@@ -24,11 +24,6 @@ _______________________________________________________________________________
 
 :DECLARE sWhere;
 
-/*:IF analyte == "POTATO SOUP" ;
-/*	where := "Sample_SDG=?sdg?";
-/*:ELSE;
-/*	where := "AnalyteName=?analyte?";
-/*:ENDIF;
 
 sWhere := limsstring(sParam + "= ?sParamVal?");
 
