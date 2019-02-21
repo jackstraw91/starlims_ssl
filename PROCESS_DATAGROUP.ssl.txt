@@ -22,7 +22,7 @@ _______________________________________________________________________________
 ********************************************************************************/;
 :PARAMETERS SDG;
 
-/*:DEFAULT SDG, '0013007';
+/*:DEFAULT SDG, '';
 
 :DECLARE strSQL, arData, filepath, tracerFlag, runList, pID, rncnt, pName, pInfo, pSOW;
 arData:={};
@@ -188,9 +188,7 @@ fileId := FileType;
 		:ENDIF;
 	
 				
-/*		arValX := StrTran(arValX,'""','');	
-/*		this line removes empty "" from the string and thus the file created;
-				
+
 
 	DoProc("MakeFile",{sdg, fileId, arValX});
 	counter := counter +1;
